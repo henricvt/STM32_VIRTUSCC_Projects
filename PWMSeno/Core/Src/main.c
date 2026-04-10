@@ -28,14 +28,14 @@
 #define DOISPI 6.2831853 // Aumentada a precisão do PI
 
 // --- MODIFICAÇÕES NAS VARIÁVEIS ---
-uint16_t seno[250];
-uint16_t i;                     // Alterado de uint8_t para uint16_t por segurança
-uint32_t frequencia_nativa = 30000000;
-uint16_t amostras = 250;
-uint16_t estouro = 200;         // Valor inicial para 60Hz (com Prescaler 10)
-uint8_t buffer[4];
-uint32_t frequencia_desejada;
-uint8_t atualizar_onda = 0;     // Flag para avisar o main() que a onda precisa ser recalculada
+uint16_t seno[250];             // VETOR CONTENDO OS "ANGULOS" CALCULADOS
+uint16_t i;                     // VARIÁVEL DE CONTROLE EM LOOPS
+uint32_t frequencia_nativa = 30000000; // FREQUENCIA DEFINIDA VIA MX PARA O CLOCK INTERNO E OS BARRAMENTOS DOS TIMERS
+uint16_t amostras = 250;              // QUANTIDADE DE ESTOUROS NECESSÁRIOS PARA DETERMINAR UMA FREQUÊNCIA IGUAL A 60 HZ PARA A SENOIDE
+uint16_t estouro = 200;               // ARR DO TIMER
+uint8_t buffer[4];                    // VETOR QUE ARMAZENA OS BYTES RECEBIDOS PELA PLACA VIA UART
+uint32_t frequencia_desejada;         // VALOR DA FREQUENCIA QUE SE DESEJA DETERMINAR PARA A SENOIDE
+uint8_t atualizar_onda = 0;     // FLAG DE CONTROLE DA ATUALIZAÇAO DOS VALORES DE SENO PELO DMA
 
 /* USER CODE END Includes */
 
@@ -66,12 +66,12 @@ UART_HandleTypeDef huart3;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
-void SystemClock_Config(void);
+void SystemClock_Config(void);  // INICIALIZAÇÃO DOS CLOCKS
 static void MPU_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_DMA_Init(void);
-static void MX_TIM3_Init(void);
-static void MX_USART3_UART_Init(void);
+static void MX_GPIO_Init(void); // INICIALIZAÇÃO DOS GPIO'S
+static void MX_DMA_Init(void);  // INICIALIZAÇÃO DO DMA
+static void MX_TIM3_Init(void); // INICIALIZAÇÃO DO TIMER 3
+static void MX_USART3_UART_Init(void); // INICIALIZAÇÃO DA USART3 (PRE-DEFINIDA PARA O ST-LINK)
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -86,27 +86,32 @@ static void MX_USART3_UART_Init(void);
   * @retval int
   */
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) // FUNCAO DE CALLBACK DA UART VIA INTERRUPCAO
 {
 	if(huart->Instance==USART3){
 
-		buffer[3] = '\0';
-		frequencia_desejada = atol((char*)buffer);
+		buffer[3] = '\0';                                 // DETERMINACAO DO ULTIMO VALOR DO BUFFER COMO SENDO O CARACTER DE ENCERRAMENTO DA DIGITACAO PELA UART
+		frequencia_desejada = atol((char*)buffer);        // CONVERSAO DO VALOR RECEBIDO VIA UART (ASCII) PARA INTEIRO
 
 		if(frequencia_desejada > 0){
 
-			uint32_t novo_arr = 12000 / frequencia_desejada;
+			uint32_t novo_arr = 12000 / frequencia_desejada; // CALCULO DO NOVO ARR PARA O VALOR DA FREQUENCIA RECEBIDO VIA UART
 
-			estouro = novo_arr;
+			estouro = novo_arr;                              // ATUALIZACAO DA VARIAVEL QUE DETERMINA O ARR DO TIMER 3
 
-			// Atualiza o registrador ARR e avisa o loop principal
-			__HAL_TIM_SET_AUTORELOAD(&htim3, estouro - 1);
-			atualizar_onda = 1;
+	
+			__HAL_TIM_SET_AUTORELOAD(&htim3, estouro - 1);  // SETANDO O NOVO VALOR DO ARR DIRETAMENTE
+			atualizar_onda = 1;                             // ATUALIZANDO FLAG DE ATUALIZACAO DE ORQUESTRACAO DA SENOIDE
 		}
 	}
 
-	for(int x=0; x<4; x++) buffer[x] = 0;
-	HAL_UART_Receive_IT(&huart3, buffer, 4);
+	for(int x=0; x<4; x++) { 
+    
+    buffer[x] = 0;                                   // LIMPANDO TODOS OS ESPAÇOS DO BUFFER
+
+  }
+
+	HAL_UART_Receive_IT(&huart3, buffer, 4);           // FUNCAO DE RECEBIMENTO DO CARACTERES DO BUFFER VIA UART EM REGIME DE INTERRUPCAO
 }
 
 
@@ -143,15 +148,16 @@ int main(void)
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  // --- GERAÇÃO INICIAL DA ONDA ---
+  // 
   for(i = 0; i < amostras; i++){
-      // Usando as variáveis dinâmicas para a geração inicial
-	  seno[i] =  ((sin(i * (DOISPI / amostras))) + 1 ) * (estouro / 2);
+
+	  seno[i] =  ((sin(i * (DOISPI / amostras))) + 1 ) * (estouro / 2);       // CALCULANDO OS VALORES "CONVERTIDOS" DE PWM PARA SENOIDAL
+
   }
 
-  HAL_TIM_PWM_Start_DMA(&htim3, TIM_CHANNEL_1, (uint32_t *)seno, amostras);
+  HAL_TIM_PWM_Start_DMA(&htim3, TIM_CHANNEL_1, (uint32_t *)seno, amostras); // INICIANDO O PWM EM REGIME DMA (DIRECT MEMORY ACCESS)
 
-  HAL_UART_Receive_IT(&huart3, buffer, 4);
+  HAL_UART_Receive_IT(&huart3, buffer, 4);                                  // CHAMANDO NOVAMENTE FUNCAO QUE RECEBE VALORES DO BUFFER (DETERMINANDO A NOVA ONDA COM OS NOVOS VALORES SENOIDAIS)
 
   /* USER CODE END 2 */
 
@@ -159,13 +165,16 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-      // --- ROTINA DE RECALCULO DA ONDA ---
+
       if (atualizar_onda == 1)
       {
           for(i = 0; i < amostras; i++){
-              seno[i] = ((sin(i * (DOISPI / amostras))) + 1 ) * (estouro / 2);
+
+              seno[i] = ((sin(i * (DOISPI / amostras))) + 1 ) * (estouro / 2);  // RECALCULANDO OS VALORES DE SENO A FIM DE RESTAURAR OS VALORES QUE O PWM DETERMINA PARA O SINAL COM A NOVA FREQUENCIA
+
           }
-          atualizar_onda = 0; // Abaixa a bandeira
+
+          atualizar_onda = 0;                                                   // ATUALIZANDO VALOR DA FLAG DE CONTROLE PARA ZERO, DETERMINANDO A ESPERA DO PROXIMO VALOR DE FREQUENCIA
       }
 
     /* USER CODE END WHILE */
