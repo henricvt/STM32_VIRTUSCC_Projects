@@ -1,6 +1,6 @@
 # 📂 Gerador de Senoide via PWM e UART - STM32
 
-Este repositório contém a implementação de um gerador de sinais senoidais desenvolvido para a placa **Nucleo-F767ZI**. O sistema utiliza modulação por largura de pulso (**PWM**) filtrada por um circuito **passa-baixas RC** para reconstruir a onda analógica fundamental.
+Este repositório contém a implementação de um gerador de sinais senoidais desenvolvido para a placa STM32 **Nucleo-F767ZI**. O sistema utiliza modulação por largura de pulso (**PWM**) filtrada por um circuito **passa-baixas RC** para reconstruir a onda analógica fundamental.
 
 ## 🚀 Motivação
 O projeto simula a lógica de controle de **inversores de frequência**, componentes essenciais para o acionamento e controle de motores de indução na indústria.
