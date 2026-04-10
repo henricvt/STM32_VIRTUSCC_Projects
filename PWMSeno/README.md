@@ -1,11 +1,11 @@
-# 📂 Gerador de Senoide via PWM e UART - STM32
+# Gerador de Senoide via PWM e UART - STM32
 
 Este repositório contém a implementação de um gerador de sinais senoidais desenvolvido para a placa STM32 **Nucleo-F767ZI**. O sistema utiliza modulação por largura de pulso (**PWM**) filtrada por um circuito **passa-baixas RC** para reconstruir a onda analógica fundamental.
 
-## 🚀 Motivação
+##
 O projeto simula a lógica de controle de **inversores de frequência**, componentes essenciais para o acionamento e controle de motores de indução na indústria.
 
-## 📐 Descrição da Solução
+##
 
 ### Hardware e Filtragem Analógica
 Para transformar o sinal digital pulsado em uma senoide limpa, foi projetado um filtro passa-baixas RC com o objetivo de atingir uma frequência de corte ($f_c$) que tornasse viável a implementação de uma senóide com frequência igual a **60 Hz**.
@@ -19,7 +19,7 @@ A fórmula utilizada para o cálculo da frequência de corte é:
 $$f_c = \frac{1}{2\pi \cdot R \cdot C}$$
 
 ### Cálculo do Sinal Senoidal via PWM
-O valor do *duty cycle* (carregado no registrador `CCR` do Timer) varia senoidalmente para que a média da tensão acompanhe a forma de onda desejada. A fórmula exata implementada no código é:
+O valor do *duty cycle* varia senoidalmente para que a média da tensão acompanhe a forma de onda desejada. A fórmula exata implementada no código é:
 
 $$seno[i] = \left( \sin\left(i \cdot \frac{2\pi}{amostras}\right) + 1 \right) \cdot \frac{estouro}{2}$$
 
@@ -29,13 +29,8 @@ $$seno[i] = \left( \sin\left(i \cdot \frac{2\pi}{amostras}\right) + 1 \right) \c
 * **`estouro / 2`**: Fator de escala baseado na resolução máxima do Timer.
 * **`2π / amostras`**: Passo angular para completar um ciclo completo.
 
-## 🛠️ Tecnologias e Funcionalidades
+## Tecnologias e Funcionalidades
 * **Hardware:** Microcontrolador STM32 (Placa Nucleo-F767ZI).
 * **Frequência Ajustável:** Controle em tempo real via comandos **UART**.
 * **Baixo THD:** Otimização para redução da Distorção Harmônica Total.
 * **Interface de Saída:** Extração da componente fundamental via filtro passivo.
-
-## 📖 Roteiro de Testes
-Para validar a solução, foram seguidos os seguintes passos:
-1. **Configuração:** Definição da frequência inicial via terminal UART.
-2. **Visualização:** Observação da onda filtrada em
