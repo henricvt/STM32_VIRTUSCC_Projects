@@ -7,11 +7,15 @@ Este repositório contém a implementação de um gerador de sinais senoidais de
 ### Hardware e Filtragem Analógica
 Para transformar o sinal digital PWM em uma senóide limpa, foi projetado um filtro passa-baixa RC com o objetivo de atingir uma frequência de corte ($f_c$) que tornasse viável a implementação da senóide com frequência igual a **60 Hz**.
 
+<p align="center">
+  <img src="PASSA_BAIXA.png" alt="Diagrama Filtro Passa-Baixa RC">
+</p>
+
 * **Resistor ($R$):** 10 kΩ
 * **Capacitor ($C$):** 100 nF
 * **Frequência de Corte Alcançada:** 159,15 Hz
 
-![Diagrama Filtro Passa-Baixa RC](PASSA-BAIXA.png)
+
 
 A fórmula utilizada para o cálculo da frequência de corte é:
 
