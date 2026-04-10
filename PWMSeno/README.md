@@ -1,7 +1,5 @@
 # 📂 Gerador de Senoide via PWM e UART - STM32
 
-![Status](https://img.shields.io/badge/status-concluído-green)
-
 Este repositório contém a implementação de um gerador de sinais senoidais desenvolvido para a placa **Nucleo-F767ZI**. O sistema utiliza modulação por largura de pulso (**PWM**) filtrada por um circuito **passa-baixas RC** para reconstruir a onda analógica fundamental.
 
 ## 🚀 Motivação
@@ -10,7 +8,7 @@ O projeto simula a lógica de controle de **inversores de frequência**, compone
 ## 📐 Descrição da Solução
 
 ### Hardware e Filtragem Analógica
-Para transformar o sinal digital pulsado em uma senoide limpa, foi projetado um filtro passa-baixas RC com o objetivo de atingir uma frequência de corte ($f_c$) próxima a **150 Hz**.
+Para transformar o sinal digital pulsado em uma senoide limpa, foi projetado um filtro passa-baixas RC com o objetivo de atingir uma frequência de corte ($f_c$) que tornasse viável a implementação de uma senóide com frequência igual a **60 Hz**.
 
 * **Resistor ($R$):** 10 kΩ
 * **Capacitor ($C$):** 100 nF
