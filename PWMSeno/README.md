@@ -11,7 +11,7 @@ Para transformar o sinal digital PWM em uma senóide limpa, foi projetado um fil
 * **Capacitor ($C$):** 100 nF
 * **Frequência de Corte Alcançada:** 159,15 Hz
 
-![Diagrama Filtro Passa-Baixa RC](PWMSeno/PASSA_BAIXA.png)
+![Diagrama Filtro Passa-Baixa RC](PASSA_BAIXA.png)
 
 A fórmula utilizada para o cálculo da frequência de corte é:
 
