@@ -3,9 +3,6 @@
 Este repositório contém a implementação de um gerador de sinais senoidais desenvolvido para a placa STM32 **Nucleo-F767ZI**. O sistema utiliza modulação por largura de pulso (**PWM**) filtrada por um circuito **passa-baixas RC** para reconstruir a onda analógica fundamental.
 
 ##
-O projeto simula a lógica de controle de **inversores de frequência**, componentes essenciais para o acionamento e controle de motores de indução na indústria.
-
-##
 
 ### Hardware e Filtragem Analógica
 Para transformar o sinal digital pulsado em uma senoide limpa, foi projetado um filtro passa-baixas RC com o objetivo de atingir uma frequência de corte ($f_c$) que tornasse viável a implementação de uma senóide com frequência igual a **60 Hz**.
