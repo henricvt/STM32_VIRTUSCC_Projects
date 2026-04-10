@@ -1,29 +1,43 @@
-# 📂 Nome da Subpasta ou Módulo
+# 📂 Gerador de Senoide via PWM e UART - STM32
 
-![Status](https://img.shields.io/badge/status-em_desenvolvimento-yellow)
+![Status](https://img.shields.io/badge/status-concluído-green)
 
-Esta pasta contém os recursos específicos para o **[Insira o objetivo, ex: Sistema de Autenticação]**. Este módulo foi isolado para garantir que a lógica de negócio fique organizada e fácil de manter.
+Este repositório contém a implementação de um gerador de sinais senoidais desenvolvido para a placa **Nucleo-F767ZI**. O sistema utiliza modulação por largura de pulso (**PWM**) filtrada por um circuito **passa-baixas RC** para reconstruir a onda analógica fundamental.
 
-## 🚀 O que tem aqui dentro?
+## 🚀 Motivação
+O projeto simula a lógica de controle de **inversores de frequência**, componentes essenciais para o acionamento e controle de motores de indução na indústria.
 
-Nesta seção do projeto, você encontrará:
-* **`src/`**: Código-fonte específico deste módulo.
-* **`tests/`**: Scripts de automação e testes unitários.
-* **`docs/`**: Documentação técnica detalhada.
+## 📐 Descrição da Solução
 
-## 🛠️ Tecnologias Utilizadas
+### Hardware e Filtragem Analógica
+Para transformar o sinal digital pulsado em uma senoide limpa, foi projetado um filtro passa-baixas RC com o objetivo de atingir uma frequência de corte ($f_c$) próxima a **150 Hz**.
 
-Para rodar o que está aqui, garantimos a compatibilidade com:
-- Linguagem principal: **[Ex: Python 3.10+]**
-- Libs principais: **[Ex: FastAPI, SQLAlchemy]**
+* **Resistor ($R$):** 10 kΩ
+* **Capacitor ($C$):** 100 nF
+* **Frequência de Corte Alcançada:** 159,15 Hz
 
-## 📖 Como usar este módulo
+A fórmula utilizada para o cálculo da frequência de corte é:
 
-Se você precisar rodar apenas este componente de forma isolada, siga os passos abaixo:
+$$f_c = \frac{1}{2\pi \cdot R \cdot C}$$
 
-1.  Navegue até esta pasta: `cd nome-da-pasta`
-2.  Instale as dependências: `npm install` (ou seu comando equivalente)
-3.  Execute o comando de entrada: `npm start`
+### Cálculo do Sinal Senoidal via PWM
+O valor do *duty cycle* (carregado no registrador `CCR` do Timer) varia senoidalmente para que a média da tensão acompanhe a forma de onda desejada. A fórmula exata implementada no código é:
 
----
-> **Nota:** Se encontrar algum bug específico nesta parte do código, por favor, abra uma *Issue* com a tag `[NOME-DA-PASTA]`.
+$$seno[i] = \left( \sin\left(i \cdot \frac{2\pi}{amostras}\right) + 1 \right) \cdot \frac{estouro}{2}$$
+
+**Onde:**
+* **`seno[i]`**: Valor de comparação do Timer (*Duty Cycle*).
+* **`+ 1`**: Deslocamento vertical (*Level Shift*) para que o sinal seja apenas positivo.
+* **`estouro / 2`**: Fator de escala baseado na resolução máxima do Timer.
+* **`2π / amostras`**: Passo angular para completar um ciclo completo.
+
+## 🛠️ Tecnologias e Funcionalidades
+* **Hardware:** Microcontrolador STM32 (Placa Nucleo-F767ZI).
+* **Frequência Ajustável:** Controle em tempo real via comandos **UART**.
+* **Baixo THD:** Otimização para redução da Distorção Harmônica Total.
+* **Interface de Saída:** Extração da componente fundamental via filtro passivo.
+
+## 📖 Roteiro de Testes
+Para validar a solução, foram seguidos os seguintes passos:
+1. **Configuração:** Definição da frequência inicial via terminal UART.
+2. **Visualização:** Observação da onda filtrada em
