@@ -4,7 +4,7 @@ Este repositório contém a implementação de um gerador de sinais senoidais de
 
 ##
 
-### Hardware e Filtragem Analógica
+## Hardware e Filtragem Analógica
 Para transformar o sinal digital PWM em uma senóide limpa, foi projetado um filtro passa-baixa RC com o objetivo de atingir uma frequência de corte ($f_c$) que tornasse viável a implementação da senóide com frequência igual a **60 Hz**.
 
 <p align="center">
