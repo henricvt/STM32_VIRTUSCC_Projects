@@ -56,7 +56,3 @@ Conforme o roteiro de testes do projeto, as seguintes etapas foram validadas:
 
 ---
 
-## 📎 Entregáveis do Projeto
-
-- [x] **Código-Fonte Comentado:** Disponível no arquivo `main.c` neste repositório.
-- [x] **Descrição e Arquitetura:** Documentada neste README.
